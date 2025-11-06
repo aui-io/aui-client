@@ -1,0 +1,373 @@
+---
+title: Real-time Agent Communication
+subtitle: Building interactive experiences with WebSockets
+---
+
+This tutorial will guide you through building a real-time conversational experience using the AUI WebSocket API. You'll learn how to establish connections, handle streaming responses, and manage the connection lifecycle.
+
+## What You'll Build
+
+By the end of this tutorial, you'll have:
+
+- Established a WebSocket connection to Apollo-1
+- Sent messages and received streaming responses
+- Handled different message types (text, recommendations, suggestions)
+- Implemented proper connection management and error handling
+
+## Prerequisites
+
+- An AUI API key
+- A task ID (create one using the REST API first)
+- Basic knowledge of WebSockets
+- Node.js or a browser environment
+
+## Step 1: Create a Task
+
+First, create a task using the REST API:
+
+```bash
+curl -X POST https://api.aui.io/tasks \
+  -H "x-network-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metadata": {
+      "user_id": "user_123",
+      "session_id": "session_456"
+    }
+  }'
+```
+
+Save the `task_id` from the response.
+
+## Step 2: Establish WebSocket Connection
+
+Connect to the WebSocket API:
+
+```javascript
+const apiKey = 'YOUR_API_KEY';
+const taskId = 'task_xyz789';
+
+const ws = new WebSocket(
+  `wss://api.aui.io/ws?network_api_key=${apiKey}&task_id=${taskId}`
+);
+
+ws.onopen = () => {
+  console.log('Connected to AUI WebSocket');
+};
+
+ws.onerror = (error) => {
+  console.error('WebSocket error:', error);
+};
+
+ws.onclose = (event) => {
+  console.log('Disconnected:', event.code, event.reason);
+};
+```
+
+## Step 3: Send a Message
+
+Once connected, send a user message:
+
+```javascript
+ws.onopen = () => {
+  console.log('Connected!');
+  
+  // Send a message
+  const message = {
+    type: 'user_message',
+    content: 'I need help choosing a product for my home office'
+  };
+  
+  ws.send(JSON.stringify(message));
+};
+```
+
+## Step 4: Handle Streaming Responses
+
+Apollo-1 streams responses in chunks. Accumulate them to build the complete response:
+
+```javascript
+let currentResponse = '';
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  
+  switch (data.type) {
+    case 'agent_text':
+      // Accumulate streaming text
+      currentResponse += data.content;
+      
+      // Update UI with partial response
+      updateChatUI(currentResponse);
+      
+      // Check if response is complete
+      if (data.is_complete) {
+        console.log('Complete response:', currentResponse);
+        currentResponse = ''; // Reset for next message
+      }
+      break;
+      
+    case 'product_recommendation':
+      console.log('Recommended product:', data.product);
+      displayProduct(data.product);
+      break;
+      
+    case 'followup_suggestion':
+      console.log('Suggestions:', data.suggestions);
+      displaySuggestions(data.suggestions);
+      break;
+      
+    case 'error':
+      console.error('Error:', data.message);
+      handleError(data);
+      break;
+  }
+};
+```
+
+## Step 5: Build a Complete Chat Interface
+
+Here's a complete example with proper connection management:
+
+```javascript
+class AuiChat {
+  constructor(apiKey, taskId) {
+    this.apiKey = apiKey;
+    this.taskId = taskId;
+    this.ws = null;
+    this.currentResponse = '';
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    
+    this.connect();
+  }
+  
+  connect() {
+    this.ws = new WebSocket(
+      `wss://api.aui.io/ws?network_api_key=${this.apiKey}&task_id=${this.taskId}`
+    );
+    
+    this.ws.onopen = () => {
+      console.log('Connected to AUI');
+      this.reconnectAttempts = 0;
+      this.onConnected();
+    };
+    
+    this.ws.onmessage = (event) => {
+      this.handleMessage(JSON.parse(event.data));
+    };
+    
+    this.ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      this.onError(error);
+    };
+    
+    this.ws.onclose = (event) => {
+      console.log('Disconnected:', event.code);
+      
+      // Attempt reconnection for non-normal closures
+      if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+        console.log(`Reconnecting in ${delay}ms...`);
+        setTimeout(() => this.connect(), delay);
+      } else {
+        this.onDisconnected(event);
+      }
+    };
+  }
+  
+  handleMessage(data) {
+    switch (data.type) {
+      case 'agent_text':
+        this.currentResponse += data.content;
+        this.onAgentText(this.currentResponse, data.is_complete);
+        
+        if (data.is_complete) {
+          this.currentResponse = '';
+        }
+        break;
+        
+      case 'product_recommendation':
+        this.onProductRecommendation(data.product);
+        break;
+        
+      case 'followup_suggestion':
+        this.onFollowupSuggestions(data.suggestions);
+        break;
+        
+      case 'error':
+        this.onError(data);
+        break;
+    }
+  }
+  
+  sendMessage(content) {
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: 'user_message',
+        content: content
+      }));
+    } else {
+      console.error('WebSocket is not connected');
+    }
+  }
+  
+  disconnect() {
+    if (this.ws) {
+      this.ws.close(1000, 'User disconnected');
+    }
+  }
+  
+  // Override these methods in your implementation
+  onConnected() {}
+  onDisconnected(event) {}
+  onAgentText(text, isComplete) {}
+  onProductRecommendation(product) {}
+  onFollowupSuggestions(suggestions) {}
+  onError(error) {}
+}
+```
+
+## Step 6: Use the Chat Class
+
+Implement the chat interface:
+
+```javascript
+const chat = new AuiChat('YOUR_API_KEY', 'task_xyz789');
+
+// Handle connection events
+chat.onConnected = () => {
+  console.log('Chat ready!');
+  document.getElementById('status').textContent = 'Connected';
+};
+
+chat.onDisconnected = (event) => {
+  console.log('Chat disconnected');
+  document.getElementById('status').textContent = 'Disconnected';
+};
+
+// Handle agent responses
+chat.onAgentText = (text, isComplete) => {
+  const messageDiv = document.getElementById('agent-message');
+  messageDiv.textContent = text;
+  
+  if (isComplete) {
+    // Add to chat history
+    addToHistory('agent', text);
+  }
+};
+
+chat.onProductRecommendation = (product) => {
+  displayProduct(product);
+};
+
+chat.onFollowupSuggestions = (suggestions) => {
+  displaySuggestions(suggestions);
+};
+
+// Send messages
+document.getElementById('send-button').onclick = () => {
+  const input = document.getElementById('message-input');
+  const message = input.value.trim();
+  
+  if (message) {
+    chat.sendMessage(message);
+    addToHistory('user', message);
+    input.value = '';
+  }
+};
+```
+
+## Best Practices
+
+### Connection Management
+
+- Implement exponential backoff for reconnections
+- Handle different close codes appropriately
+- Provide user feedback on connection status
+
+### Message Handling
+
+- Accumulate streaming text chunks properly
+- Reset state after complete messages
+- Handle all message types gracefully
+
+### Error Handling
+
+- Display user-friendly error messages
+- Implement retry logic for transient errors
+- Log errors for debugging
+
+### Performance
+
+- Debounce rapid user inputs
+- Implement message queuing for offline scenarios
+- Clean up resources on disconnect
+
+## Complete Example with React
+
+Here's a complete React component:
+
+```typescript
+import { useEffect, useState, useRef } from 'react';
+
+function AuiChatComponent({ apiKey, taskId }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [status, setStatus] = useState('disconnected');
+  const chatRef = useRef(null);
+  
+  useEffect(() => {
+    const chat = new AuiChat(apiKey, taskId);
+    chatRef.current = chat;
+    
+    chat.onConnected = () => setStatus('connected');
+    chat.onDisconnected = () => setStatus('disconnected');
+    
+    chat.onAgentText = (text, isComplete) => {
+      if (isComplete) {
+        setMessages(prev => [...prev, { actor: 'agent', content: text }]);
+      }
+    };
+    
+    return () => chat.disconnect();
+  }, [apiKey, taskId]);
+  
+  const sendMessage = () => {
+    if (input.trim() && chatRef.current) {
+      chatRef.current.sendMessage(input);
+      setMessages(prev => [...prev, { actor: 'user', content: input }]);
+      setInput('');
+    }
+  };
+  
+  return (
+    <div className="chat-container">
+      <div className="status">{status}</div>
+      <div className="messages">
+        {messages.map((msg, i) => (
+          <div key={i} className={`message ${msg.actor}`}>
+            {msg.content}
+          </div>
+        ))}
+      </div>
+      <div className="input-area">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+          placeholder="Type a message..."
+        />
+        <button onClick={sendMessage}>Send</button>
+      </div>
+    </div>
+  );
+}
+```
+
+## Next Steps
+
+- Learn about [WebSocket Communication](/websocket) concepts
+- Explore [Tasks](/tasks) and [Messages](/messages)
+- Check the [API Reference](/api-reference) for complete documentation

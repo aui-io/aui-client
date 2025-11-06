@@ -1,0 +1,261 @@
+---
+title: Creating Your First Task
+subtitle: A step-by-step guide to creating and managing tasks
+---
+
+This tutorial will walk you through creating your first task, submitting messages, and retrieving the conversation history using the AUI API.
+
+## What You'll Build
+
+By the end of this tutorial, you'll have:
+
+- Created a task with custom metadata
+- Submitted user messages to the task
+- Retrieved the conversation history
+- Understood the basic task lifecycle
+
+## Prerequisites
+
+- An AUI API key
+- Basic knowledge of REST APIs
+- A tool to make HTTP requests (curl, Postman, or code)
+
+## Step 1: Set Up Your Environment
+
+First, store your API key in an environment variable:
+
+```bash
+export AUI_API_KEY="your_api_key_here"
+```
+
+## Step 2: Create a Task
+
+Create a new task with metadata to track the user and session:
+
+```bash
+curl -X POST https://api.aui.io/tasks \
+  -H "x-network-api-key: $AUI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metadata": {
+      "user_id": "user_12345",
+      "session_id": "session_67890",
+      "channel": "web",
+      "context": {
+        "page": "product_page",
+        "product_id": "prod_abc123"
+      }
+    }
+  }'
+```
+
+**Expected Response:**
+
+```json
+{
+  "task_id": "task_xyz789",
+  "created_at": "2025-11-05T23:00:00Z",
+  "metadata": {
+    "user_id": "user_12345",
+    "session_id": "session_67890",
+    "channel": "web",
+    "context": {
+      "page": "product_page",
+      "product_id": "prod_abc123"
+    }
+  }
+}
+```
+
+<Tip>
+Save the `task_id` from the response - you'll need it for all subsequent operations.
+</Tip>
+
+## Step 3: Submit Your First Message
+
+Now submit a message from the user to the task:
+
+```bash
+curl -X POST https://api.aui.io/tasks/task_xyz789/messages \
+  -H "x-network-api-key: $AUI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "I am interested in this product. Can you tell me more about it?",
+    "actor": "user"
+  }'
+```
+
+**Expected Response:**
+
+```json
+{
+  "message_id": "msg_001",
+  "task_id": "task_xyz789",
+  "content": "I am interested in this product. Can you tell me more about it?",
+  "actor": "user",
+  "timestamp": "2025-11-05T23:01:00Z"
+}
+```
+
+## Step 4: Wait for Agent Response
+
+Apollo-1 will process your message and generate a response. In a production application, you would typically use the WebSocket API for real-time responses, but for this tutorial, we'll poll the messages endpoint.
+
+Wait a moment, then retrieve all messages:
+
+```bash
+curl -X GET https://api.aui.io/tasks/task_xyz789/messages \
+  -H "x-network-api-key: $AUI_API_KEY"
+```
+
+**Expected Response:**
+
+```json
+{
+  "messages": [
+    {
+      "message_id": "msg_001",
+      "content": "I am interested in this product. Can you tell me more about it?",
+      "actor": "user",
+      "timestamp": "2025-11-05T23:01:00Z"
+    },
+    {
+      "message_id": "msg_002",
+      "content": "I'd be happy to help you learn more about this product! It's one of our most popular items. What specific aspects would you like to know about - features, pricing, availability, or something else?",
+      "actor": "agent",
+      "timestamp": "2025-11-05T23:01:05Z"
+    }
+  ],
+  "pagination": {
+    "total": 2,
+    "page": 1,
+    "page_size": 50,
+    "has_more": false
+  }
+}
+```
+
+## Step 5: Continue the Conversation
+
+Submit another message to continue the conversation:
+
+```bash
+curl -X POST https://api.aui.io/tasks/task_xyz789/messages \
+  -H "x-network-api-key: $AUI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "What are the key features?",
+    "actor": "user"
+  }'
+```
+
+## Using the SDK
+
+Here's how to accomplish the same workflow using the official SDKs:
+
+<CodeBlocks>
+  <CodeBlock title="TypeScript">
+    ```typescript
+    import { AuiClient } from '@fern-demo/aui-ts';
+
+    const client = new AuiClient({
+      apiKey: process.env.AUI_API_KEY
+    });
+
+    async function createFirstTask() {
+      // Step 1: Create a task
+      const task = await client.tasks.create({
+        metadata: {
+          user_id: 'user_12345',
+          session_id: 'session_67890',
+          channel: 'web',
+          context: {
+            page: 'product_page',
+            product_id: 'prod_abc123'
+          }
+        }
+      });
+
+      console.log('Task created:', task.task_id);
+
+      // Step 2: Submit a message
+      const message = await client.tasks.submitMessage(task.task_id, {
+        content: 'I am interested in this product. Can you tell me more about it?',
+        actor: 'user'
+      });
+
+      console.log('Message submitted:', message.message_id);
+
+      // Step 3: Wait a moment for agent response
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Step 4: Retrieve messages
+      const messages = await client.tasks.getMessages(task.task_id);
+      
+      console.log('Conversation:');
+      messages.messages.forEach(msg => {
+        console.log(`${msg.actor}: ${msg.content}`);
+      });
+    }
+
+    createFirstTask();
+    ```
+  </CodeBlock>
+  <CodeBlock title="Python">
+    ```python
+    import os
+    import time
+    from fern_demo_aui_python import AuiClient
+
+    client = AuiClient(api_key=os.environ['AUI_API_KEY'])
+
+    # Step 1: Create a task
+    task = client.tasks.create(
+        metadata={
+            'user_id': 'user_12345',
+            'session_id': 'session_67890',
+            'channel': 'web',
+            'context': {
+                'page': 'product_page',
+                'product_id': 'prod_abc123'
+            }
+        }
+    )
+
+    print(f'Task created: {task.task_id}')
+
+    # Step 2: Submit a message
+    message = client.tasks.submit_message(
+        task_id=task.task_id,
+        content='I am interested in this product. Can you tell me more about it?',
+        actor='user'
+    )
+
+    print(f'Message submitted: {message.message_id}')
+
+    # Step 3: Wait for agent response
+    time.sleep(2)
+
+    # Step 4: Retrieve messages
+    messages = client.tasks.get_messages(task_id=task.task_id)
+
+    print('Conversation:')
+    for msg in messages.messages:
+        print(f'{msg.actor}: {msg.content}')
+    ```
+  </CodeBlock>
+</CodeBlocks>
+
+## Key Takeaways
+
+- **Tasks** are containers for conversations with unique IDs
+- **Metadata** helps you track context and organize tasks
+- **Messages** flow between users and the AI agent
+- **Actor types** distinguish between user and agent messages
+
+## Next Steps
+
+- Learn about [Real-time Communication](/realtime-communication) with WebSockets
+- Explore [Tasks](/tasks) in depth
+- Understand [Messages](/messages) and pagination
+- Check the [API Reference](/api-reference) for all endpoints

@@ -1,4 +1,4 @@
-import { AuiApolloApiClient } from '../../generated-sdks/typescript';
+import { AuiApiClient } from '@aui.io/apollo-sdk';
 
 // Configuration
 const API_KEY = process.env.API_KEY || 'API_KEY_01K92N5BD5M7239VRK7YTK4Y6N';
@@ -10,18 +10,16 @@ async function testGetMessages() {
     console.log(`Base URL: ${BASE_URL}`);
     console.log(`Task ID: ${TASK_ID}\n`);
 
-    // Initialize client
-    const client = new AuiApolloApiClient({
-        environment: BASE_URL,
+    // Initialize client with API key
+    const client = new AuiApiClient({
+        baseUrl: BASE_URL,
+        apiKey: API_KEY,
     });
 
     try {
-        console.log('📡 Calling getTaskMessagesApiV1ExternalTasksTaskIdMessagesGet...\n');
+        console.log('📡 Calling externalApis.getTaskMessages...\n');
         
-        const result = await client.getTaskMessagesApiV1ExternalTasksTaskIdMessagesGet({
-            task_id: TASK_ID,
-            'x-network-api-key': API_KEY,
-        });
+        const result = await client.externalApis.getTaskMessages(TASK_ID);
 
         console.log('✅ Success! Response received:\n');
         console.log(JSON.stringify(result, null, 2));

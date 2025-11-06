@@ -1,0 +1,187 @@
+---
+title: Quickstart
+subtitle: Get started with the AUI API in minutes
+---
+
+This guide will walk you through creating your first task and sending your first message using the AUI API.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- An AUI API key (contact the AUI team to obtain one)
+- A tool to make HTTP requests (curl, Postman, or your preferred HTTP client)
+
+## Step 1: Create a Task
+
+First, create a new task using the REST API:
+
+```bash
+curl -X POST https://api.aui.io/tasks \
+  -H "x-network-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metadata": {
+      "user_id": "user_123",
+      "session_id": "session_456"
+    }
+  }'
+```
+
+The response will include a `task_id` that you'll use for subsequent requests:
+
+```json
+{
+  "task_id": "task_789",
+  "created_at": "2025-11-05T23:00:00Z",
+  "metadata": {
+    "user_id": "user_123",
+    "session_id": "session_456"
+  }
+}
+```
+
+## Step 2: Submit a Message
+
+Now submit a message to your task:
+
+```bash
+curl -X POST https://api.aui.io/tasks/task_789/messages \
+  -H "x-network-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Hello, I need help with my order",
+    "actor": "user"
+  }'
+```
+
+The API will process your message and return a response:
+
+```json
+{
+  "message_id": "msg_101",
+  "task_id": "task_789",
+  "content": "Hello, I need help with my order",
+  "actor": "user",
+  "timestamp": "2025-11-05T23:01:00Z"
+}
+```
+
+## Step 3: Retrieve Messages
+
+Retrieve all messages for your task:
+
+```bash
+curl -X GET https://api.aui.io/tasks/task_789/messages \
+  -H "x-network-api-key: YOUR_API_KEY"
+```
+
+The response includes all messages in the conversation:
+
+```json
+{
+  "messages": [
+    {
+      "message_id": "msg_101",
+      "content": "Hello, I need help with my order",
+      "actor": "user",
+      "timestamp": "2025-11-05T23:01:00Z"
+    },
+    {
+      "message_id": "msg_102",
+      "content": "I'd be happy to help you with your order. Could you please provide your order number?",
+      "actor": "agent",
+      "timestamp": "2025-11-05T23:01:05Z"
+    }
+  ],
+  "pagination": {
+    "total": 2,
+    "page": 1,
+    "page_size": 50
+  }
+}
+```
+
+## Step 4: Connect via WebSocket (Optional)
+
+For real-time communication, connect to the WebSocket API:
+
+```javascript
+const ws = new WebSocket('wss://api.aui.io/ws?network_api_key=YOUR_API_KEY&task_id=task_789');
+
+ws.onopen = () => {
+  console.log('Connected to AUI WebSocket');
+  
+  // Send a message
+  ws.send(JSON.stringify({
+    type: 'user_message',
+    content: 'What is the status of my order?'
+  }));
+};
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Received:', data);
+};
+```
+
+## Using SDKs
+
+AUI provides official SDKs for TypeScript and Python:
+
+<CodeBlocks>
+  <CodeBlock title="TypeScript">
+    ```typescript
+    import { AuiClient } from '@fern-demo/aui-ts';
+
+    const client = new AuiClient({
+      apiKey: 'YOUR_API_KEY'
+    });
+
+    // Create a task
+    const task = await client.tasks.create({
+      metadata: {
+        user_id: 'user_123',
+        session_id: 'session_456'
+      }
+    });
+
+    // Submit a message
+    const message = await client.tasks.submitMessage(task.task_id, {
+      content: 'Hello, I need help',
+      actor: 'user'
+    });
+    ```
+  </CodeBlock>
+  <CodeBlock title="Python">
+    ```python
+    from fern_demo_aui_python import AuiClient
+
+    client = AuiClient(api_key='YOUR_API_KEY')
+
+    # Create a task
+    task = client.tasks.create(
+        metadata={
+            'user_id': 'user_123',
+            'session_id': 'session_456'
+        }
+    )
+
+    # Submit a message
+    message = client.tasks.submit_message(
+        task_id=task.task_id,
+        content='Hello, I need help',
+        actor='user'
+    )
+    ```
+  </CodeBlock>
+</CodeBlocks>
+
+## Next Steps
+
+Now that you've created your first task and sent your first message, explore these topics:
+
+- [Tasks](/tasks) - Learn more about task management
+- [Messages](/messages) - Understand message handling
+- [WebSocket Communication](/websocket) - Real-time bidirectional communication
+- [API Reference](/api-reference) - Complete API documentation

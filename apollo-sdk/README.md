@@ -1,225 +1,270 @@
-# Apollo SDK - Automated Generation & Publishing
+# Apollo SDK
 
-Automated SDK generation and publishing for TypeScript and Python from FastAPI OpenAPI specifications.
+TypeScript and Python SDKs for the AUI Apollo API, featuring REST endpoints and WebSocket real-time communication.
 
-## Quick Start
+## 📦 Published Package
 
-### Generate SDKs Locally
+**npm:** [`@aui.io/apollo-sdk`](https://www.npmjs.com/package/@aui.io/apollo-sdk)  
+**PyPI:** `aui-apollo-sdk` (optional)
 
-```bash
-cd apollo-sdk
-./generate-and-publish.sh --local-only
-```
-
-Generated SDKs will be in:
-- `generated-sdks/typescript/`
-- `generated-sdks/python/`
-
-### Publish to npm and PyPI
+## 🚀 Installation
 
 ```bash
-export NPM_TOKEN='your-npm-token'
-export PYPI_TOKEN='your-pypi-token'
-./generate-and-publish.sh
+npm install @aui.io/apollo-sdk
 ```
 
-## Prerequisites
+## 💻 Usage
 
-- **Node.js 18+** with npm
-- **jq** (JSON processor): `brew install jq` or `apt-get install jq`
-- **Fern CLI**: `npm install -g fern-api`
-- **curl** (usually pre-installed)
+### REST API
 
-## Usage
+```typescript
+import { AuiApiClient } from '@aui.io/apollo-sdk';
 
-### Options
+const client = new AuiApiClient({
+  baseUrl: 'https://api-staging.internal-aui.io/ia-controller',
+  apiKey: 'your-api-key',
+});
 
-| Command | Description |
-|---------|-------------|
-| `./generate-and-publish.sh --local-only` | Generate SDKs locally without publishing |
-| `./generate-and-publish.sh --dry-run` | Validate without making changes |
-| `./generate-and-publish.sh --skip-publish` | Generate but don't publish |
-| `./generate-and-publish.sh` | Full run: generate and publish |
+// Get task messages
+const messages = await client.externalApis.getTaskMessages('task-id');
 
-### What It Does
+// Create a task
+const task = await client.externalApis.createTask({
+  user_id: 'user-123',
+  text: 'Find a microwave',
+});
 
-1. Fetches OpenAPI from production (`https://azure.aui.io/api/ia-controller/api/openapi.json`)
-2. Filters external-only endpoints (paths containing `/external/`)
-3. Validates OpenAPI and AsyncAPI specifications
-4. Generates TypeScript SDK using Fern
-5. Generates Python SDK using Fern
-6. Publishes to npm (`@aui/apollo-sdk`) and PyPI (`aui-apollo-api`)
+// Submit a message
+await client.externalApis.submitMessage({
+  task_id: 'task-id',
+  text: 'Hello',
+});
+```
 
-## Directory Structure
+### WebSocket Real-Time Communication
+
+```typescript
+import { AuiApiClient } from '@aui.io/apollo-sdk';
+
+const client = new AuiApiClient({
+  apiKey: 'your-api-key',
+});
+
+// Connect to WebSocket
+const socket = await client.externalSession.connect();
+
+// Listen for messages
+socket.on('open', () => {
+  console.log('Connected');
+});
+
+socket.on('message', (message) => {
+  console.log('Received:', message);
+});
+
+// Send a message
+socket.sendUserMessage({
+  task_id: 'task-id',
+  text: 'I need help finding a product',
+});
+
+// Close connection
+socket.close();
+```
+
+## 🏗️ Project Structure
 
 ```
 apollo-sdk/
-├── generate-and-publish.sh      # Main automation script
-├── specs/                        # API specifications
-│   ├── openapi.json              # Full OpenAPI (fetched)
-│   ├── external-openapi.json     # Filtered external-only
-│   └── asyncapi.yaml             # WebSocket API spec
-├── scripts/                      # Automation scripts
-│   ├── fetch-openapi.sh          # Fetch from production
-│   └── filter-external-api.js    # Filter external endpoints
-├── fern/                         # Fern configuration
-│   ├── fern.config.json
-│   ├── generators.yml            # SDK generation config
-│   └── definition/
-│       ├── api.yml
-│       └── openapi.json          # OpenAPI used by Fern
-├── generated-sdks/               # Local SDK outputs
+├── fern/                      # Fern configuration
+│   ├── openapi.json          # OpenAPI 3.1.0 spec (generated from production)
+│   ├── asyncapi.yaml         # AsyncAPI 3.0.0 spec (WebSocket)
+│   └── generators.yml        # SDK generation config
+├── scripts/                   # Automation scripts
+│   ├── fetch-openapi.sh      # Fetch API spec from production
+│   └── filter-external-api.js # Filter external endpoints only
+├── tests/                     # SDK tests
+│   └── typescript/           # TypeScript test suite
+├── generated-sdks/           # Generated SDKs (local development)
 │   ├── typescript/
 │   └── python/
-└── tests/                        # Integration tests
-    ├── typescript/
-    └── python/
+├── generate-and-publish.sh   # Main automation script
+├── DEVOPS-GUIDE.md          # DevOps publishing guide
+└── README.md                # This file
 ```
 
-## Published Packages
+## 🔧 Development
 
-### TypeScript SDK
+### For DevOps: Publishing the SDK
 
-**Package:** `@aui/apollo-sdk`  
-**Registry:** npm
+**See [DEVOPS-GUIDE.md](./DEVOPS-GUIDE.md) for complete instructions.**
 
-**Installation:**
+Quick publish command:
 ```bash
-npm install @aui/apollo-sdk
+NPM_TOKEN="npm_your_token" ./generate-and-publish.sh
 ```
 
-**Usage:**
-```typescript
-import { AuiApolloApiClient } from '@aui/apollo-sdk';
-
-const client = new AuiApolloApiClient({
-  environment: 'https://azure.aui.io/api/ia-controller',
-});
-
-const messages = await client.getTaskMessagesApiV1ExternalTasksTaskIdMessagesGet({
-  task_id: 'task-id',
-  'x-network-api-key': 'your-api-key',
-});
-```
-
-### Python SDK
-
-**Package:** `aui-apollo-api`  
-**Registry:** PyPI
-
-**Installation:**
-```bash
-pip install aui-apollo-api
-```
-
-**Usage:**
-```python
-from aui_apollo_api import AuiApolloApiClient
-
-client = AuiApolloApiClient(
-    base_url='https://azure.aui.io/api/ia-controller'
-)
-
-messages = client.get_task_messages_api_v_1_external_tasks_task_id_messages_get(
-    task_id='task-id',
-    x_network_api_key='your-api-key'
-)
-```
-
-## Testing
-
-### TypeScript Test
+### For Developers: Testing Locally
 
 ```bash
+# Generate SDKs locally without publishing
+./generate-and-publish.sh --local-only
+
+# Run tests
 cd tests/typescript
 npm install
-npm test
+npm test                  # REST API test
+npm run test:websocket    # WebSocket test
 ```
 
-### Python Test
+## 📋 API Features
 
-```bash
-cd tests/python
-python3 test_tasks.py
+### REST Endpoints
+- **Create Task**: `POST /api/v1/external/tasks`
+- **Get Task Messages**: `GET /api/v1/external/tasks/{task_id}/messages`
+- **Submit Message**: `POST /api/v1/external/message`
+
+### WebSocket
+- **Connect**: Real-time bidirectional communication
+- **Send Messages**: User messages to agent
+- **Receive Events**: 
+  - Streaming text updates
+  - Product recommendations
+  - Final messages
+  - Error notifications
+
+## 🔐 Authentication
+
+All API calls require an API key:
+
+```typescript
+const client = new AuiApiClient({
+  apiKey: 'API_KEY_XXXXXXXXXX',
+});
 ```
 
-## Troubleshooting
+For WebSocket, authentication is handled automatically using the same API key.
 
-### Error: "Missing required environment variables"
+## 🛠️ Script Commands
 
-Set tokens or use `--local-only`:
 ```bash
-export NPM_TOKEN='your-npm-token'
-export PYPI_TOKEN='your-pypi-token'
-# Or run without publishing:
+# Generate and publish (requires NPM_TOKEN)
+NPM_TOKEN="token" ./generate-and-publish.sh
+
+# Generate locally only
 ./generate-and-publish.sh --local-only
+
+# Dry run (validate without publishing)
+./generate-and-publish.sh --dry-run
+
+# Skip publishing step
+./generate-and-publish.sh --skip-publish
+
+# Get help
+./generate-and-publish.sh --help
 ```
 
-### Error: "fern: command not found"
+## 📊 Workflow
+
+The automation script performs these steps:
+
+1. **Fetch OpenAPI** from production (`https://azure.aui.io`)
+2. **Filter** to external-only endpoints (3 endpoints, 13 schemas)
+3. **Validate** OpenAPI and AsyncAPI specifications
+4. **Generate** SDKs using Fern
+5. **Publish** to npm (and optionally PyPI)
+
+## 🧪 Testing
+
+### Test Files
+- `tests/typescript/test-tasks.js` - REST API tests
+- `tests/typescript/test-websocket.js` - WebSocket tests
+
+### Running Tests
+```bash
+cd tests/typescript
+
+# Install the published package
+npm install @aui.io/apollo-sdk
+
+# Run REST API test
+npm test
+
+# Run WebSocket test
+npm run test:websocket
+
+# Run all tests
+npm run test:all
+```
+
+## 🌐 Environments
+
+### Staging
+- **REST API**: `https://api-staging.internal-aui.io/ia-controller`
+- **WebSocket**: Configured automatically by SDK
+
+### Production
+- **REST API**: `https://api.aui.io/ia-controller`
+- **WebSocket**: Configured automatically by SDK
+
+## 📝 Configuration
+
+### generators.yml
+Main configuration for SDK generation:
+- TypeScript SDK: `@aui.io/apollo-sdk`
+- Python SDK: `aui-apollo-sdk` (optional)
+- WebSocket support: Enabled
+- Target versions: Latest stable
+
+## 🔄 Version Management
+
+Versions are auto-incremented by Fern with each publish. Check current version:
 
 ```bash
-npm install -g fern-api
+npm view @aui.io/apollo-sdk version
 ```
 
-### Error: "jq: command not found"
+## 🆘 Troubleshooting
+
+### "Unauthorized" errors in tests
+The default API keys in tests are placeholders. Use real API keys:
 
 ```bash
-# macOS
-brew install jq
-
-# Linux
-sudo apt-get install jq
+API_KEY="your-key" TASK_ID="your-task-id" npm test
 ```
 
-### Error: "Failed to fetch OpenAPI spec"
-
-Check network connectivity to `https://azure.aui.io/api/ia-controller/api/openapi.json`
-
-## CI/CD Integration
-
-### Jenkins Pipeline Example
-
-```groovy
-pipeline {
-    agent any
-    
-    environment {
-        NPM_TOKEN = credentials('npm-publish-token')
-        PYPI_TOKEN = credentials('pypi-publish-token')
-    }
-    
-    triggers {
-        cron('0 2 * * *')  // Daily at 2 AM
-    }
-    
-    stages {
-        stage('Generate and Publish SDKs') {
-            steps {
-                dir('apollo-sdk') {
-                    sh '''
-                        export NPM_TOKEN="${NPM_TOKEN}"
-                        export PYPI_TOKEN="${PYPI_TOKEN}"
-                        ./generate-and-publish.sh
-                    '''
-                }
-            }
-        }
-    }
-}
+### npm cache permission errors
+```bash
+npm cache clean --force
 ```
 
-### Required Jenkins Credentials
+### Import errors after publishing
+Wait a few minutes for npm CDN to propagate, then:
+```bash
+npm install @aui.io/apollo-sdk@latest
+```
 
-- `npm-publish-token` (Secret text) - npm publish token
-- `pypi-publish-token` (Secret text) - PyPI publish token
+## 📚 Additional Resources
 
-## Notes
+- **DevOps Guide**: See [DEVOPS-GUIDE.md](./DEVOPS-GUIDE.md) for publishing instructions
+- **OpenAPI Spec**: See `fern/openapi.json`
+- **AsyncAPI Spec**: See `fern/asyncapi.yaml`
+- **Fern Docs**: https://docs.buildwithfern.com
 
-- The OpenAPI spec is automatically fetched from production on each run
-- Only external endpoints (containing `/external/`) are included in the SDKs
-- The `servers` field is automatically added to the OpenAPI spec during filtering
-- Generated SDKs are in `generated-sdks/` (gitignored)
+## 🤝 Contributing
 
-## Support
+This SDK is auto-generated from the production API specification. To update:
 
-For issues or questions, contact the Platform Team.
+1. Modify the OpenAPI spec in production
+2. Run the generation script
+3. Publish the new version
+
+## 📄 License
+
+Internal use only - AUI.io
+
+---
+
+**Package:** `@aui.io/apollo-sdk`  
+**Generated by:** Fern  
+**Updated:** Automatically from production API

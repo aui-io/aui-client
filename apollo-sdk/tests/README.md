@@ -10,13 +10,29 @@ cd tests/typescript
 npm install
 ```
 
-### Run
+### Run Tests
+
+#### REST API Test
 ```bash
-# Use default values
+# Test task messages endpoint
 npm test
 
 # Or with custom values
-API_KEY='your-api-key' USER_ID='your-user-id' BASE_URL='https://api-staging.internal-aui.io/ia-controller' npm test
+API_KEY='your-api-key' TASK_ID='your-task-id' BASE_URL='https://api-staging.internal-aui.io/ia-controller' npm test
+```
+
+#### WebSocket Test
+```bash
+# Test WebSocket real-time communication
+npm run test:websocket
+
+# Or with custom values
+API_KEY='your-api-key' TASK_ID='6909127a8b91758e2d2f4ff9' MESSAGE_TEXT='I am looking for a built-in microwave' npm run test:websocket
+```
+
+#### Run All Tests
+```bash
+npm run test:all
 ```
 
 ## Python Test
@@ -39,7 +55,13 @@ API_KEY='your-api-key' USER_ID='your-user-id' BASE_URL='https://api-staging.inte
 
 ## Environment Variables
 
-- `API_KEY`: Your API key (default: test key)
-- `USER_ID`: User ID to fetch tasks for (default: 'test-user-123')
-- `BASE_URL`: Base URL for the API (default: staging URL)
+### REST API Tests
+- `API_KEY`: Your API key for authentication
+- `TASK_ID`: Task ID to fetch messages for
+- `BASE_URL`: Base URL for the REST API (default: staging URL)
+
+### WebSocket Tests
+- `API_KEY`: Your API key for WebSocket authentication
+- `TASK_ID`: Task ID for the conversation
+- `MESSAGE_TEXT`: The message text to send to the agent
 

@@ -20,6 +20,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# NPM token must be provided via environment variable for security
+# export NPM_TOKEN="your-token-here"  # Do NOT hardcode tokens!
+
 # Configuration
 DRY_RUN=false
 SKIP_PUBLISH=false
@@ -73,11 +76,15 @@ check_env_vars() {
     local missing_vars=()
     
     if [ "$SKIP_PUBLISH" = false ] && [ "$LOCAL_ONLY" = false ]; then
+        # NPM token is required for publishing
         if [ -z "$NPM_TOKEN" ]; then
             missing_vars+=("NPM_TOKEN")
         fi
+        
+        # PYPI token is optional - warn if not set
         if [ -z "$PYPI_TOKEN" ]; then
-            missing_vars+=("PYPI_TOKEN")
+            echo -e "${YELLOW}⚠️  PYPI_TOKEN not set - Python package will NOT be published${NC}"
+            echo ""
         fi
     fi
     
@@ -88,8 +95,10 @@ check_env_vars() {
         done
         echo ""
         echo "Please set them before running this script:"
-        echo "  export NPM_TOKEN='your-npm-token'"
-        echo "  export PYPI_TOKEN='your-pypi-token'"
+        echo "  export NPM_TOKEN='npm_YOUR_TOKEN_HERE'"
+        echo ""
+        echo "Optional (for Python publishing):"
+        echo "  export PYPI_TOKEN='pypi_YOUR_TOKEN_HERE'"
         echo ""
         echo "Or run with --local-only to skip publishing"
         exit 1
@@ -162,10 +171,10 @@ if [ "$DRY_RUN" = true ]; then
 else
     node filter-external-api.js
     
-    # Copy filtered OpenAPI to Fern definition directory
-    echo "📋 Copying filtered OpenAPI to Fern definition..."
-    cp ../specs/external-openapi.json ../fern/definition/openapi.json
-    echo -e "${GREEN}✅ OpenAPI copied to Fern definition${NC}"
+    # Copy filtered OpenAPI to Fern directory
+    echo "📋 Copying filtered OpenAPI to Fern directory..."
+    cp ../specs/external-openapi.json ../fern/openapi.json
+    echo -e "${GREEN}✅ OpenAPI copied to Fern directory${NC}"
 fi
 
 ################################################################################
@@ -210,8 +219,12 @@ fi
 
 if [ "$LOCAL_ONLY" = true ]; then
     echo ""
-    echo "💻 Generating SDKs locally..."
-    fern generate --group local-testing --log-level info
+    echo "💻 Generating TypeScript SDK locally..."
+    fern generate --group typescript --log-level info
+    echo ""
+    echo "💻 Generating Python SDK locally..."
+    fern generate --group python --log-level info
+    echo ""
     echo -e "${GREEN}✅ SDKs generated locally in generated-sdks/${NC}"
     echo ""
     echo "📦 Local SDK paths:"
@@ -227,17 +240,35 @@ if [ "$SKIP_PUBLISH" = false ]; then
     print_step "📦 STEP 5: Publishing SDKs"
     
     if [ "$DRY_RUN" = true ]; then
-        echo -e "${YELLOW}🔍 DRY RUN: Would publish SDKs to npm and PyPI${NC}"
+        if [ -z "$PYPI_TOKEN" ]; then
+            echo -e "${YELLOW}🔍 DRY RUN: Would publish SDK to npm only${NC}"
+        else
+            echo -e "${YELLOW}🔍 DRY RUN: Would publish SDKs to npm and PyPI${NC}"
+        fi
     else
-        echo "🚀 Publishing to npm and PyPI..."
-        fern generate --group production-sdks --log-level info
-        
-        echo ""
-        echo -e "${GREEN}✅ SDKs published successfully!${NC}"
-        echo ""
-        echo "📦 Published packages:"
-        echo "   - npm: @aui/apollo-sdk"
-        echo "   - PyPI: aui-apollo-api"
+        # Determine which group to use based on available tokens
+        if [ -z "$PYPI_TOKEN" ]; then
+            echo "🚀 Publishing to npm only..."
+            echo -e "${YELLOW}⚠️  Skipping PyPI (PYPI_TOKEN not set)${NC}"
+            echo ""
+            fern generate --group npm --log-level info
+            
+            echo ""
+            echo -e "${GREEN}✅ SDK published successfully!${NC}"
+            echo ""
+            echo "📦 Published package:"
+            echo "   - npm: @aui.io/apollo-sdk"
+        else
+            echo "🚀 Publishing to npm and PyPI..."
+            fern generate --group publish-all --log-level info
+            
+            echo ""
+            echo -e "${GREEN}✅ SDKs published successfully!${NC}"
+            echo ""
+            echo "📦 Published packages:"
+            echo "   - npm: @aui.io/apollo-sdk"
+            echo "   - PyPI: aui-apollo-sdk"
+        fi
     fi
 fi
 
@@ -264,8 +295,12 @@ echo ""
 
 if [ "$LOCAL_ONLY" = false ] && [ "$SKIP_PUBLISH" = false ] && [ "$DRY_RUN" = false ]; then
     echo "📚 Installation commands:"
-    echo "   npm install @aui/apollo-sdk"
-    echo "   pip install aui-apollo-api"
+    if [ -z "$PYPI_TOKEN" ]; then
+        echo "   npm install @aui.io/apollo-sdk"
+    else
+        echo "   npm install @aui.io/apollo-sdk"
+        echo "   pip install aui-apollo-sdk"
+    fi
 fi
 
 echo ""

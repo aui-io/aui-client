@@ -1,0 +1,262 @@
+---
+title: WebSocket Communication
+subtitle: Real-time bidirectional communication with Apollo-1
+---
+
+The AUI WebSocket API enables real-time bidirectional communication between your application and Apollo-1. This allows for streaming responses, instant updates, and interactive conversational experiences.
+
+## Connection
+
+Connect to the WebSocket API:
+
+```
+wss://api.aui.io/ws?network_api_key=YOUR_API_KEY&task_id=TASK_ID
+```
+
+**Query Parameters:**
+
+- `network_api_key` - Your API key for authentication
+- `task_id` - The task ID for this conversation
+
+## Message Types
+
+The WebSocket API supports several message types for different purposes.
+
+### User Messages
+
+Send a message from the user:
+
+```json
+{
+  "type": "user_message",
+  "content": "What products do you recommend?"
+}
+```
+
+### Agent Responses
+
+Receive streaming text from the agent:
+
+```json
+{
+  "type": "agent_text",
+  "content": "Based on your preferences, I recommend...",
+  "is_complete": false
+}
+```
+
+The `is_complete` field indicates whether this is the final chunk of the response.
+
+### Product Recommendations
+
+Receive product recommendations:
+
+```json
+{
+  "type": "product_recommendation",
+  "product": {
+    "id": "prod_123",
+    "name": "Premium Widget",
+    "price": 99.99,
+    "description": "High-quality widget for your needs"
+  }
+}
+```
+
+### Follow-up Suggestions
+
+Receive suggested follow-up questions:
+
+```json
+{
+  "type": "followup_suggestion",
+  "suggestions": [
+    "Tell me more about the warranty",
+    "What colors are available?",
+    "Can I get expedited shipping?"
+  ]
+}
+```
+
+### Error Messages
+
+Handle errors gracefully:
+
+```json
+{
+  "type": "error",
+  "code": "RATE_LIMIT_EXCEEDED",
+  "message": "Too many requests. Please slow down."
+}
+```
+
+## Connection Lifecycle
+
+### Opening Connection
+
+```javascript
+const ws = new WebSocket('wss://api.aui.io/ws?network_api_key=YOUR_API_KEY&task_id=task_789');
+
+ws.onopen = () => {
+  console.log('Connected to AUI WebSocket');
+};
+```
+
+### Sending Messages
+
+```javascript
+ws.send(JSON.stringify({
+  type: 'user_message',
+  content: 'Hello, I need assistance'
+}));
+```
+
+### Receiving Messages
+
+```javascript
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  
+  switch (data.type) {
+    case 'agent_text':
+      console.log('Agent:', data.content);
+      break;
+    case 'product_recommendation':
+      console.log('Recommended:', data.product.name);
+      break;
+    case 'followup_suggestion':
+      console.log('Suggestions:', data.suggestions);
+      break;
+    case 'error':
+      console.error('Error:', data.message);
+      break;
+  }
+};
+```
+
+### Handling Disconnection
+
+```javascript
+ws.onclose = (event) => {
+  console.log('Disconnected:', event.code, event.reason);
+  
+  // Implement reconnection logic
+  if (event.code !== 1000) {
+    setTimeout(() => reconnect(), 1000);
+  }
+};
+
+ws.onerror = (error) => {
+  console.error('WebSocket error:', error);
+};
+```
+
+## Close Codes
+
+The WebSocket API uses specific close codes:
+
+| Code | Meaning | Action |
+|------|---------|--------|
+| 1000 | Normal closure | No action needed |
+| 1008 | Policy violation | Check authentication |
+| 4001 | Invalid authentication | Verify API key |
+| 4002 | Task not found | Verify task ID |
+| 4003 | Rate limit exceeded | Implement backoff |
+
+## Best Practices
+
+### Connection Management
+
+Implement robust connection management:
+
+```javascript
+class AuiWebSocket {
+  constructor(apiKey, taskId) {
+    this.apiKey = apiKey;
+    this.taskId = taskId;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.connect();
+  }
+  
+  connect() {
+    this.ws = new WebSocket(
+      `wss://api.aui.io/ws?network_api_key=${this.apiKey}&task_id=${this.taskId}`
+    );
+    
+    this.ws.onopen = () => {
+      console.log('Connected');
+      this.reconnectAttempts = 0;
+    };
+    
+    this.ws.onclose = (event) => {
+      if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+        setTimeout(() => this.connect(), delay);
+      }
+    };
+    
+    this.ws.onmessage = (event) => {
+      this.handleMessage(JSON.parse(event.data));
+    };
+  }
+  
+  handleMessage(data) {
+    // Handle different message types
+  }
+  
+  send(message) {
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(message));
+    }
+  }
+}
+```
+
+### Message Buffering
+
+Buffer messages when the connection is not ready:
+
+```javascript
+const messageQueue = [];
+
+function sendMessage(message) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(message));
+  } else {
+    messageQueue.push(message);
+  }
+}
+
+ws.onopen = () => {
+  // Send queued messages
+  while (messageQueue.length > 0) {
+    ws.send(JSON.stringify(messageQueue.shift()));
+  }
+};
+```
+
+### Heartbeat
+
+Implement heartbeat to detect connection issues:
+
+```javascript
+let heartbeatInterval;
+
+ws.onopen = () => {
+  heartbeatInterval = setInterval(() => {
+    ws.send(JSON.stringify({ type: 'ping' }));
+  }, 30000);
+};
+
+ws.onclose = () => {
+  clearInterval(heartbeatInterval);
+};
+```
+
+## Next Steps
+
+- Learn about [Tasks](/tasks) and [Messages](/messages)
+- Follow the [Real-time Communication Tutorial](/realtime-communication)
+- Check the [API Reference](/api-reference) for complete documentation

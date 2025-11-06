@@ -4,13 +4,17 @@
   "description": "Test project for Apollo SDK",
   "type": "module",
   "scripts": {
-    "test": "tsx test-tasks.js"
+    "test": "tsx test-tasks.js",
+    "test:websocket": "tsx test-websocket.js",
+    "test:all": "tsx test-tasks.js && tsx test-websocket.js"
   },
   "dependencies": {
-    "tsx": "^4.7.0"
+    "@aui.io/apollo-sdk": "^0.0.46",
+    "tsx": "^4.7.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.5.10"
   }
 }
-

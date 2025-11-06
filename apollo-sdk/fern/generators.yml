@@ -1,54 +1,71 @@
-default-group: production-sdks
+# yaml-language-server: $schema=https://schema.buildwithfern.dev/generators-yml.json
+
+api:
+  specs:
+    - openapi: openapi.json
+    - asyncapi: asyncapi.yaml
+
+default-group: local
 
 groups:
-  production-sdks:
+  # Local development - generates SDKs to local file system
+  local:
     generators:
-      # TypeScript SDK - Publish to npm
       - name: fernapi/fern-typescript-sdk
-        version: 3.19.1
-        output:
-          location: npm
-          package-name: "@aui/apollo-sdk"
-          token: ${NPM_TOKEN}
+        version: 3.27.0
         config:
-          namespaceExport: AuiApolloApi
-          allowCustomFetcher: true
-          requireDefaultEnvironment: false
-          defaultTimeoutInSeconds: 60
-      
-      # Python SDK - Publish to PyPI
-      - name: fernapi/fern-python-sdk
-        version: 4.6.0
-        output:
-          location: pypi
-          package-name: aui-apollo-api
-          token: ${PYPI_TOKEN}
-        config:
-          client_class_name: AuiApolloApiClient
-          package_name: aui_apollo_api
-          timeout_in_seconds: 60
-
-  local-testing:
-    generators:
-      # TypeScript SDK - Local output for testing
-      - name: fernapi/fern-typescript-sdk
-        version: 3.19.1
+          shouldGenerateWebsocketClients: true
         output:
           location: local-file-system
           path: ../generated-sdks/typescript
-        config:
-          namespaceExport: AuiApolloApi
-          allowCustomFetcher: true
-          requireDefaultEnvironment: false
-          defaultTimeoutInSeconds: 60
-      
-      # Python SDK - Local output for testing
       - name: fernapi/fern-python-sdk
-        version: 4.6.0
+        version: 4.32.2
+        config:
+          should_generate_websocket_clients: true
         output:
           location: local-file-system
           path: ../generated-sdks/python
+
+  # Publish to npm (no GitHub required)
+  npm:
+    generators:
+      - name: fernapi/fern-typescript-sdk
+        version: 3.27.0
         config:
-          client_class_name: AuiApolloApiClient
-          package_name: aui_apollo_api
-          timeout_in_seconds: 60
+          shouldGenerateWebsocketClients: true
+        output:
+          location: npm
+          package-name: "@aui.io/apollo-sdk"
+          token: ${NPM_TOKEN}
+
+  # Publish to PyPI (optional)
+  pypi:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 4.32.2
+        config:
+          should_generate_websocket_clients: true
+        output:
+          location: pypi
+          package-name: "aui-apollo-sdk"
+          token: ${PYPI_TOKEN}
+
+  # Publish both (npm + PyPI)
+  publish-all:
+    generators:
+      - name: fernapi/fern-typescript-sdk
+        version: 3.27.0
+        config:
+          shouldGenerateWebsocketClients: true
+        output:
+          location: npm
+          package-name: "@aui.io/apollo-sdk"
+          token: ${NPM_TOKEN}
+      - name: fernapi/fern-python-sdk
+        version: 4.32.2
+        config:
+          should_generate_websocket_clients: true
+        output:
+          location: pypi
+          package-name: "aui-apollo-sdk"
+          token: ${PYPI_TOKEN}
