@@ -23,7 +23,8 @@ export class ExternalSession {
         const { headers, debug, reconnectAttempts } = args;
         
         // Get API key for query parameter authentication (WebSocket fix)
-        const apiKeyValue = await core.Supplier.get(this._options.networkApiKey);
+        // Prefer networkApiKey, fall back to apiKey if not set
+        const apiKeyValue = await core.Supplier.get(this._options.networkApiKey ?? this._options.apiKey);
         
         // Merge custom headers
         const _headers: Record<string, unknown> = mergeHeaders({}, headers);
