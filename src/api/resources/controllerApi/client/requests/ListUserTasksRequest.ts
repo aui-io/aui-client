@@ -8,7 +8,7 @@
  *         size: 1
  *     }
  */
-export interface GetTasksByUserIdApiV1ExternalTasksGetRequest {
+export interface ListUserTasksRequest {
     user_id: string;
     page?: number;
     size?: number;

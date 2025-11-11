@@ -6,9 +6,8 @@ export interface ExternalTaskMessage {
     id: string;
     created_at: string;
     text: string;
-    sender: Apollo.ExternalTaskMessageContactParty;
-    receiver: Apollo.ExternalTaskMessageContactParty;
-    options: Apollo.ExternalTaskMessageOption[];
-    variants_options: Apollo.ExternalTaskMessageOption[];
+    sender: Apollo.MessageContactParty;
+    receiver: Apollo.MessageContactParty;
+    cards: Apollo.ExternalMessageCard[];
     followup_suggestions: string[];
 }

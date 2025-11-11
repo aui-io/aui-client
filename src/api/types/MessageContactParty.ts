@@ -2,9 +2,8 @@
 
 import type * as Apollo from "../index.js";
 
-export interface ProductCard {
+export interface MessageContactParty {
     id: string;
-    name: string;
-    parameters: Apollo.ProductParameter[];
-    is_recommended?: boolean;
+    type: Apollo.Actor;
+    email?: string;
 }
