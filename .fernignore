@@ -1,1 +1,4 @@
 # Specify files that shouldn't be modified by Fern
+
+# TypeScript WebSocket fix (empty protocols array bug for Node.js v21+)
+src/core/websocket/ws.ts
