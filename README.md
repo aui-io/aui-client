@@ -1,43 +1,50 @@
-# @aui.io/apollo-sdk
+# @aui.io/aui-client
 
-[![npm version](https://img.shields.io/npm/v/@aui.io/apollo-sdk)](https://www.npmjs.com/package/@aui.io/apollo-sdk)
+[![npm version](https://img.shields.io/npm/v/@aui.io/aui-client)](https://www.npmjs.com/package/@aui.io/aui-client)
 [![Built with Fern](https://img.shields.io/badge/Built%20with-Fern-brightgreen)](https://buildwithfern.com)
 
 > **Official TypeScript/JavaScript SDK for AUI APIs** - Provides REST and WebSocket support for intelligent agent communication.
 
 ## 🚀 Installation
 
+**TypeScript/JavaScript:**
 ```bash
-npm install @aui.io/apollo-sdk
+npm install @aui.io/aui-client
+```
+
+**Python:**
+```bash
+pip install aui-client
 ```
 
 ## ⚡ Quick Start
 
-### Initialize Client
+### TypeScript/JavaScript
 
 ```typescript
-import { ApolloClient } from '@aui.io/apollo-sdk';
+import { ApolloClient } from '@aui.io/aui-client';
 
-// Option 1: Use default environment (production)
 const client = new ApolloClient({
     networkApiKey: 'API_KEY_YOUR_KEY_HERE'
 });
 
-// Option 2: Use custom base URL
-const client = new ApolloClient({
-    baseUrl: 'https://api-staging.internal-aui.io/ia-controller',
-    networkApiKey: 'API_KEY_YOUR_KEY_HERE'
-});
-
-// Option 3: Override environment (useful if your endpoint structure differs)
-const client = new ApolloClient({
-    environment: {
-        base: 'https://your-api-domain.com/ia-controller',
-        staging: 'wss://your-websocket-domain.com'
-    },
-    networkApiKey: 'API_KEY_YOUR_KEY_HERE'
-});
+// This connects to production:
+// - REST API: https://azure.aui.io/api/ia-controller
+// - WebSocket: wss://api.aui.io/ia-controller/api/v1/external/session
 ```
+
+### Python
+
+```python
+from aui_client import ApolloClient
+
+client = ApolloClient(
+    network_api_key='API_KEY_YOUR_KEY_HERE'
+)
+
+# Connects to the same production endpoints as TypeScript
+```
+
 
 ### REST API - Create and Manage Tasks
 
@@ -71,7 +78,7 @@ const userTasks = await client.externalApis.getTasksByUserId({
 
 ```typescript
 // Connect to WebSocket
-const socket = await client.externalSession.connect();
+const socket = await client.apolloSession.connect();
 
 // Listen for connection open
 socket.on('open', () => {
@@ -146,13 +153,15 @@ interface ApolloClient.Options {
 }
 ```
 
-**Default Environment:**
+**Production Environment (Default):**
 ```typescript
 {
-    base: "https://azure.aui.io/api/ia-controller",
-    staging: "wss://api-staging.internal-aui.io"
+    base: "https://azure.aui.io/api/ia-controller",    // REST API
+    production: "wss://api.aui.io"                     // WebSocket
 }
 ```
+
+The SDK is configured for production use. All REST and WebSocket connections use production servers.
 
 ---
 
@@ -210,7 +219,7 @@ const response = await client.externalApis.getTasksByUserId({
 
 ### WebSocket API
 
-All WebSocket methods are accessed via `client.externalSession.*`
+All WebSocket methods are accessed via `client.apolloSession.*`
 
 #### `connect(args?)` - Establish Connection
 Connect to the WebSocket for real-time communication.
@@ -271,10 +280,9 @@ const state = socket.readyState;
 ### Complete Example: E-commerce Product Search
 
 ```typescript
-import { ApolloClient } from '@aui.io/apollo-sdk';
+import { ApolloClient } from '@aui.io/aui-client';
 
 const client = new ApolloClient({
-    baseUrl: 'https://api-staging.internal-aui.io/ia-controller',
     networkApiKey: 'API_KEY_YOUR_KEY_HERE'
 });
 
@@ -335,7 +343,7 @@ searchProducts('user123', 'I need a gaming laptop under $1500');
 ### REST API Only: Check Task Status
 
 ```typescript
-import { ApolloClient } from '@aui.io/apollo-sdk';
+import { ApolloClient } from '@aui.io/aui-client';
 
 const client = new ApolloClient({
     networkApiKey: 'API_KEY_YOUR_KEY_HERE'
@@ -535,10 +543,11 @@ npm install --save-dev typescript@latest
 
 ## 🔗 Resources
 
-- **GitHub Repository:** [aui-io/apollo-sdk](https://github.com/aui-io/apollo-sdk)
-- **npm Package:** [@aui.io/apollo-sdk](https://www.npmjs.com/package/@aui.io/apollo-sdk)
+- **GitHub Repository:** [aui-io/aui-client](https://github.com/aui-io/aui-client)
+- **npm Package:** [@aui.io/aui-client](https://www.npmjs.com/package/@aui.io/aui-client)
+- **PyPI Package:** [aui-client](https://pypi.org/project/aui-client)
 - **API Documentation:** [Full API Reference](https://docs.aui.io)
-- **Report Issues:** [GitHub Issues](https://github.com/aui-io/apollo-sdk/issues)
+- **Report Issues:** [GitHub Issues](https://github.com/aui-io/aui-client/issues)
 
 ## 📄 License
 

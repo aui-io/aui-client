@@ -389,7 +389,7 @@ export class ReconnectingWebSocket {
                 // FIX: Don't pass empty protocols array - it breaks header authentication in Node.js v21+
                 // Only pass protocols parameter if it has actual values
                 if (this._protocols && this._protocols.length > 0) {
-                this._ws = new WebSocket(url, this._protocols, options);
+                    this._ws = new WebSocket(url, this._protocols, options);
                 } else {
                     this._ws = new WebSocket(url, options);
                 }
