@@ -7,19 +7,13 @@
 
 ## 🚀 Installation
 
-**TypeScript/JavaScript:**
 ```bash
 npm install @aui.io/aui-client
 ```
 
-**Python:**
-```bash
-pip install aui-client
-```
+**Also available in Python:** `pip install aui-client` - [Python Documentation](https://github.com/aui-io/aui-client-python)
 
 ## ⚡ Quick Start
-
-### TypeScript/JavaScript
 
 ```typescript
 import { ApolloClient } from '@aui.io/aui-client';
@@ -31,18 +25,6 @@ const client = new ApolloClient({
 // This connects to production:
 // - REST API: https://azure.aui.io/api/ia-controller
 // - WebSocket: wss://api.aui.io/ia-controller/api/v1/external/session
-```
-
-### Python
-
-```python
-from aui_client import ApolloClient
-
-client = ApolloClient(
-    network_api_key='API_KEY_YOUR_KEY_HERE'
-)
-
-# Connects to the same production endpoints as TypeScript
 ```
 
 
@@ -543,11 +525,11 @@ npm install --save-dev typescript@latest
 
 ## 🔗 Resources
 
-- **GitHub Repository:** [aui-io/aui-client](https://github.com/aui-io/aui-client)
+- **GitHub Repository:** [aui-io/aui-client-typescript](https://github.com/aui-io/aui-client-typescript)
 - **npm Package:** [@aui.io/aui-client](https://www.npmjs.com/package/@aui.io/aui-client)
-- **PyPI Package:** [aui-client](https://pypi.org/project/aui-client)
+- **Python SDK:** [aui-client on PyPI](https://pypi.org/project/aui-client) | [Python Docs](https://github.com/aui-io/aui-client-python)
 - **API Documentation:** [Full API Reference](https://docs.aui.io)
-- **Report Issues:** [GitHub Issues](https://github.com/aui-io/aui-client/issues)
+- **Report Issues:** [GitHub Issues](https://github.com/aui-io/aui-client-typescript/issues)
 
 ## 📄 License
 
