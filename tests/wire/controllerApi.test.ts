@@ -8,7 +8,6 @@ describe("ControllerApi", () => {
     test("list_user_tasks (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -59,7 +58,6 @@ describe("ControllerApi", () => {
     test("list_user_tasks (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -83,7 +81,6 @@ describe("ControllerApi", () => {
     test("create_task (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -119,7 +116,6 @@ describe("ControllerApi", () => {
     test("create_task (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -144,7 +140,6 @@ describe("ControllerApi", () => {
     test("get_task_messages (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -200,7 +195,6 @@ describe("ControllerApi", () => {
     test("get_task_messages (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -222,7 +216,6 @@ describe("ControllerApi", () => {
     test("send_message (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });
@@ -279,7 +272,6 @@ describe("ControllerApi", () => {
     test("send_message (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
-            apiKey: "test",
             networkApiKey: "test",
             environment: { base: server.baseUrl, staging: server.baseUrl },
         });

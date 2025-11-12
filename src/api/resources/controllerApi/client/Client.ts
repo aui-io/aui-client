@@ -59,7 +59,6 @@ export class ControllerApi {
             this._options?.headers,
             mergeOnlyDefinedHeaders({
                 "x-network-api-key": requestOptions?.networkApiKey ?? this._options?.networkApiKey,
-                ...(await this._getCustomAuthorizationHeaders()),
             }),
             requestOptions?.headers,
         );
@@ -142,7 +141,6 @@ export class ControllerApi {
             this._options?.headers,
             mergeOnlyDefinedHeaders({
                 "x-network-api-key": requestOptions?.networkApiKey ?? this._options?.networkApiKey,
-                ...(await this._getCustomAuthorizationHeaders()),
             }),
             requestOptions?.headers,
         );
@@ -226,7 +224,6 @@ export class ControllerApi {
             this._options?.headers,
             mergeOnlyDefinedHeaders({
                 "x-network-api-key": requestOptions?.networkApiKey ?? this._options?.networkApiKey,
-                ...(await this._getCustomAuthorizationHeaders()),
             }),
             requestOptions?.headers,
         );
@@ -319,7 +316,6 @@ export class ControllerApi {
             this._options?.headers,
             mergeOnlyDefinedHeaders({
                 "x-network-api-key": requestOptions?.networkApiKey ?? this._options?.networkApiKey,
-                ...(await this._getCustomAuthorizationHeaders()),
             }),
             requestOptions?.headers,
         );
@@ -377,10 +373,5 @@ export class ControllerApi {
                     rawResponse: _response.rawResponse,
                 });
         }
-    }
-
-    protected async _getCustomAuthorizationHeaders(): Promise<Record<string, string | undefined>> {
-        const apiKeyValue = await core.Supplier.get(this._options.apiKey);
-        return { "x-api-key": apiKeyValue };
     }
 }

@@ -7,7 +7,6 @@ export interface BaseClientOptions {
     environment?: core.Supplier<environments.ApolloEnvironment | environments.ApolloEnvironmentUrls>;
     /** Specify a custom URL to connect the client to. */
     baseUrl?: core.Supplier<string>;
-    apiKey?: core.Supplier<string | undefined>;
     /** Override the x-network-api-key header */
     networkApiKey?: core.Supplier<string | undefined>;
     /** Additional headers to include in requests. */
