@@ -2,9 +2,9 @@
 
 import type * as Apollo from "../index.js";
 
-export interface ExternalMessageCard {
+export interface Card {
     id: string;
     name: string;
-    parameters: Apollo.ExternalMessageCardParameter[];
+    parameters: Apollo.CardParameter[];
     is_recommended: boolean;
 }

@@ -2,12 +2,12 @@
 
 import type * as Apollo from "../index.js";
 
-export interface ExternalTaskMessage {
+export interface Message {
     id: string;
     created_at: string;
     text: string;
     sender: Apollo.MessageContactParty;
     receiver: Apollo.MessageContactParty;
-    cards: Apollo.ExternalMessageCard[];
+    cards: Apollo.Card[];
     followup_suggestions: string[];
 }

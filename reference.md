@@ -1,6 +1,6 @@
 # Reference
 ## ControllerApi
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">listUserTasks</a>({ ...params }) -> Apollo.ListExternalTasksResponse</code></summary>
+<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">listUserTasks</a>({ ...params }) -> Apollo.ListTasksResponse</code></summary>
 <dl>
 <dd>
 
@@ -53,7 +53,7 @@ await client.controllerApi.listUserTasks({
 </dl>
 </details>
 
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">createTask</a>({ ...params }) -> Apollo.CreateExternalTaskResponse</code></summary>
+<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">createTask</a>({ ...params }) -> Apollo.CreateTaskResponse</code></summary>
 <dl>
 <dd>
 
@@ -84,7 +84,7 @@ await client.controllerApi.createTask({
 <dl>
 <dd>
 
-**request:** `Apollo.CreateExternalTaskRequest` 
+**request:** `Apollo.CreateTaskRequest` 
     
 </dd>
 </dl>
@@ -104,7 +104,7 @@ await client.controllerApi.createTask({
 </dl>
 </details>
 
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">getTaskMessages</a>(taskId) -> Apollo.ExternalTaskMessage[]</code></summary>
+<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">getTaskMessages</a>(taskId) -> Apollo.Message[]</code></summary>
 <dl>
 <dd>
 
@@ -153,7 +153,7 @@ await client.controllerApi.getTaskMessages("task_id");
 </dl>
 </details>
 
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">sendMessage</a>({ ...params }) -> Apollo.ExternalTaskMessage</code></summary>
+<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">sendMessage</a>({ ...params }) -> Apollo.Message</code></summary>
 <dl>
 <dd>
 
@@ -186,7 +186,7 @@ await client.controllerApi.sendMessage({
 <dl>
 <dd>
 
-**request:** `Apollo.SubmitExternalMessageRequest` 
+**request:** `Apollo.SubmitMessageRequest` 
     
 </dd>
 </dl>

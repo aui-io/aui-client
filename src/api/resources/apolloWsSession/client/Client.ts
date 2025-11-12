@@ -49,6 +49,6 @@ export class ApolloWsSession {
 
     protected async _getCustomAuthorizationHeaders(): Promise<Record<string, string | undefined>> {
         const apiKeyValue = await core.Supplier.get(this._options.apiKey);
-        return { "x-network-api-key": apiKeyValue };
+        return { "x-api-key": apiKeyValue };
     }
 }

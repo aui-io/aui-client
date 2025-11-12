@@ -2,8 +2,8 @@
 
 import type * as Apollo from "../index.js";
 
-export interface ListExternalTasksResponse {
-    tasks?: Apollo.CreateExternalTaskResponse[];
+export interface ListTasksResponse {
+    tasks?: Apollo.CreateTaskResponse[];
     total: number;
     page: number;
     size: number;

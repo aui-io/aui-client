@@ -36,14 +36,14 @@ export class ControllerApi {
     public listUserTasks(
         request: Apollo.ListUserTasksRequest,
         requestOptions?: ControllerApi.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.ListExternalTasksResponse> {
+    ): core.HttpResponsePromise<Apollo.ListTasksResponse> {
         return core.HttpResponsePromise.fromPromise(this.__listUserTasks(request, requestOptions));
     }
 
     private async __listUserTasks(
         request: Apollo.ListUserTasksRequest,
         requestOptions?: ControllerApi.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.ListExternalTasksResponse>> {
+    ): Promise<core.WithRawResponse<Apollo.ListTasksResponse>> {
         const { user_id: userId, page, size } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         _queryParams.user_id = userId;
@@ -80,7 +80,7 @@ export class ControllerApi {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.ListExternalTasksResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.ListTasksResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -117,7 +117,7 @@ export class ControllerApi {
     }
 
     /**
-     * @param {Apollo.CreateExternalTaskRequest} request
+     * @param {Apollo.CreateTaskRequest} request
      * @param {ControllerApi.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Apollo.UnprocessableEntityError}
@@ -128,16 +128,16 @@ export class ControllerApi {
      *     })
      */
     public createTask(
-        request: Apollo.CreateExternalTaskRequest,
+        request: Apollo.CreateTaskRequest,
         requestOptions?: ControllerApi.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.CreateExternalTaskResponse> {
+    ): core.HttpResponsePromise<Apollo.CreateTaskResponse> {
         return core.HttpResponsePromise.fromPromise(this.__createTask(request, requestOptions));
     }
 
     private async __createTask(
-        request: Apollo.CreateExternalTaskRequest,
+        request: Apollo.CreateTaskRequest,
         requestOptions?: ControllerApi.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.CreateExternalTaskResponse>> {
+    ): Promise<core.WithRawResponse<Apollo.CreateTaskResponse>> {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({
@@ -166,7 +166,7 @@ export class ControllerApi {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.CreateExternalTaskResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.CreateTaskResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -214,14 +214,14 @@ export class ControllerApi {
     public getTaskMessages(
         taskId: string,
         requestOptions?: ControllerApi.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.ExternalTaskMessage[]> {
+    ): core.HttpResponsePromise<Apollo.Message[]> {
         return core.HttpResponsePromise.fromPromise(this.__getTaskMessages(taskId, requestOptions));
     }
 
     private async __getTaskMessages(
         taskId: string,
         requestOptions?: ControllerApi.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.ExternalTaskMessage[]>> {
+    ): Promise<core.WithRawResponse<Apollo.Message[]>> {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({
@@ -247,7 +247,7 @@ export class ControllerApi {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.ExternalTaskMessage[], rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.Message[], rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -286,7 +286,7 @@ export class ControllerApi {
     }
 
     /**
-     * @param {Apollo.SubmitExternalMessageRequest} request
+     * @param {Apollo.SubmitMessageRequest} request
      * @param {ControllerApi.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Apollo.UnprocessableEntityError}
@@ -299,16 +299,16 @@ export class ControllerApi {
      *     })
      */
     public sendMessage(
-        request: Apollo.SubmitExternalMessageRequest,
+        request: Apollo.SubmitMessageRequest,
         requestOptions?: ControllerApi.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.ExternalTaskMessage> {
+    ): core.HttpResponsePromise<Apollo.Message> {
         return core.HttpResponsePromise.fromPromise(this.__sendMessage(request, requestOptions));
     }
 
     private async __sendMessage(
-        request: Apollo.SubmitExternalMessageRequest,
+        request: Apollo.SubmitMessageRequest,
         requestOptions?: ControllerApi.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.ExternalTaskMessage>> {
+    ): Promise<core.WithRawResponse<Apollo.Message>> {
         const { is_external_api: isExternalApi, ..._body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (isExternalApi != null) {
@@ -343,7 +343,7 @@ export class ControllerApi {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.ExternalTaskMessage, rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.Message, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -381,6 +381,6 @@ export class ControllerApi {
 
     protected async _getCustomAuthorizationHeaders(): Promise<Record<string, string | undefined>> {
         const apiKeyValue = await core.Supplier.get(this._options.apiKey);
-        return { "x-network-api-key": apiKeyValue };
+        return { "x-api-key": apiKeyValue };
     }
 }

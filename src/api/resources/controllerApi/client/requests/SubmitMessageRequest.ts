@@ -10,7 +10,7 @@ import type * as Apollo from "../../../../index.js";
  *         text: "text"
  *     }
  */
-export interface SubmitExternalMessageRequest {
+export interface SubmitMessageRequest {
     is_external_api?: boolean;
     task_id: string;
     text: string;
