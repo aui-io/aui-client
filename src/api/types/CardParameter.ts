@@ -2,8 +2,8 @@
 
 import type * as Apollo from "../index.js";
 
-export interface ExternalTaskMessageContactParty {
-    id: string;
-    type: Apollo.Actor;
-    email?: string;
+export interface CardParameter {
+    title: string;
+    value?: unknown;
+    type: Apollo.ParameterType;
 }

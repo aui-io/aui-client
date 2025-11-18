@@ -7,43 +7,43 @@ import * as environments from "../../../../environments.js";
 import * as errors from "../../../../errors/index.js";
 import * as Apollo from "../../../index.js";
 
-export declare namespace ExternalApis {
+export declare namespace ControllerApi {
     export interface Options extends BaseClientOptions {}
 
     export interface RequestOptions extends BaseRequestOptions {}
 }
 
-export class ExternalApis {
-    protected readonly _options: ExternalApis.Options;
+export class ControllerApi {
+    protected readonly _options: ControllerApi.Options;
 
-    constructor(_options: ExternalApis.Options = {}) {
+    constructor(_options: ControllerApi.Options = {}) {
         this._options = _options;
     }
 
     /**
-     * @param {Apollo.GetTasksByUserIdApiV1ExternalTasksGetRequest} request
-     * @param {ExternalApis.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Apollo.ListUserTasksRequest} request
+     * @param {ControllerApi.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Apollo.UnprocessableEntityError}
      *
      * @example
-     *     await client.externalApis.getTasksByUserId({
+     *     await client.controllerApi.listUserTasks({
      *         user_id: "user_id",
      *         page: 1,
      *         size: 1
      *     })
      */
-    public getTasksByUserId(
-        request: Apollo.GetTasksByUserIdApiV1ExternalTasksGetRequest,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.ListExternalTasksResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__getTasksByUserId(request, requestOptions));
+    public listUserTasks(
+        request: Apollo.ListUserTasksRequest,
+        requestOptions?: ControllerApi.RequestOptions,
+    ): core.HttpResponsePromise<Apollo.ListTasksResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listUserTasks(request, requestOptions));
     }
 
-    private async __getTasksByUserId(
-        request: Apollo.GetTasksByUserIdApiV1ExternalTasksGetRequest,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.ListExternalTasksResponse>> {
+    private async __listUserTasks(
+        request: Apollo.ListUserTasksRequest,
+        requestOptions?: ControllerApi.RequestOptions,
+    ): Promise<core.WithRawResponse<Apollo.ListTasksResponse>> {
         const { user_id: userId, page, size } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         _queryParams.user_id = userId;
@@ -79,7 +79,7 @@ export class ExternalApis {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.ListExternalTasksResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.ListTasksResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -116,27 +116,27 @@ export class ExternalApis {
     }
 
     /**
-     * @param {Apollo.CreateExternalTaskRequest} request
-     * @param {ExternalApis.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Apollo.CreateTaskRequest} request
+     * @param {ControllerApi.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Apollo.UnprocessableEntityError}
      *
      * @example
-     *     await client.externalApis.task({
+     *     await client.controllerApi.createTask({
      *         user_id: "user_id"
      *     })
      */
-    public task(
-        request: Apollo.CreateExternalTaskRequest,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.CreateExternalTaskResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__task(request, requestOptions));
+    public createTask(
+        request: Apollo.CreateTaskRequest,
+        requestOptions?: ControllerApi.RequestOptions,
+    ): core.HttpResponsePromise<Apollo.CreateTaskResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__createTask(request, requestOptions));
     }
 
-    private async __task(
-        request: Apollo.CreateExternalTaskRequest,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.CreateExternalTaskResponse>> {
+    private async __createTask(
+        request: Apollo.CreateTaskRequest,
+        requestOptions?: ControllerApi.RequestOptions,
+    ): Promise<core.WithRawResponse<Apollo.CreateTaskResponse>> {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({
@@ -164,7 +164,7 @@ export class ExternalApis {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.CreateExternalTaskResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.CreateTaskResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -202,24 +202,24 @@ export class ExternalApis {
 
     /**
      * @param {string} taskId
-     * @param {ExternalApis.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {ControllerApi.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Apollo.UnprocessableEntityError}
      *
      * @example
-     *     await client.externalApis.getTaskMessages("task_id")
+     *     await client.controllerApi.getTaskMessages("task_id")
      */
     public getTaskMessages(
         taskId: string,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.ExternalTaskMessage[]> {
+        requestOptions?: ControllerApi.RequestOptions,
+    ): core.HttpResponsePromise<Apollo.Message[]> {
         return core.HttpResponsePromise.fromPromise(this.__getTaskMessages(taskId, requestOptions));
     }
 
     private async __getTaskMessages(
         taskId: string,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.ExternalTaskMessage[]>> {
+        requestOptions?: ControllerApi.RequestOptions,
+    ): Promise<core.WithRawResponse<Apollo.Message[]>> {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({
@@ -244,7 +244,7 @@ export class ExternalApis {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.ExternalTaskMessage[], rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.Message[], rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -283,29 +283,29 @@ export class ExternalApis {
     }
 
     /**
-     * @param {Apollo.SubmitExternalMessageRequest} request
-     * @param {ExternalApis.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Apollo.SubmitMessageRequest} request
+     * @param {ControllerApi.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Apollo.UnprocessableEntityError}
      *
      * @example
-     *     await client.externalApis.message({
+     *     await client.controllerApi.sendMessage({
      *         is_external_api: true,
      *         task_id: "task_id",
      *         text: "text"
      *     })
      */
-    public message(
-        request: Apollo.SubmitExternalMessageRequest,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): core.HttpResponsePromise<Apollo.ExternalTaskMessage> {
-        return core.HttpResponsePromise.fromPromise(this.__message(request, requestOptions));
+    public sendMessage(
+        request: Apollo.SubmitMessageRequest,
+        requestOptions?: ControllerApi.RequestOptions,
+    ): core.HttpResponsePromise<Apollo.Message> {
+        return core.HttpResponsePromise.fromPromise(this.__sendMessage(request, requestOptions));
     }
 
-    private async __message(
-        request: Apollo.SubmitExternalMessageRequest,
-        requestOptions?: ExternalApis.RequestOptions,
-    ): Promise<core.WithRawResponse<Apollo.ExternalTaskMessage>> {
+    private async __sendMessage(
+        request: Apollo.SubmitMessageRequest,
+        requestOptions?: ControllerApi.RequestOptions,
+    ): Promise<core.WithRawResponse<Apollo.Message>> {
         const { is_external_api: isExternalApi, ..._body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (isExternalApi != null) {
@@ -339,7 +339,7 @@ export class ExternalApis {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Apollo.ExternalTaskMessage, rawResponse: _response.rawResponse };
+            return { data: _response.body as Apollo.Message, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
