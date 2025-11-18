@@ -1,6 +1,6 @@
 # Reference
-## ControllerApi
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">listUserTasks</a>({ ...params }) -> Apollo.ListTasksResponse</code></summary>
+## ExternalApis
+<details><summary><code>client.externalApis.<a href="/src/api/resources/externalApis/client/Client.ts">getTasksByUserId</a>({ ...params }) -> Apollo.ListExternalTasksResponse</code></summary>
 <dl>
 <dd>
 
@@ -13,7 +13,7 @@
 <dd>
 
 ```typescript
-await client.controllerApi.listUserTasks({
+await client.externalApis.getTasksByUserId({
     user_id: "user_id",
     page: 1,
     size: 1
@@ -33,7 +33,7 @@ await client.controllerApi.listUserTasks({
 <dl>
 <dd>
 
-**request:** `Apollo.ListUserTasksRequest` 
+**request:** `Apollo.GetTasksByUserIdApiV1ExternalTasksGetRequest` 
     
 </dd>
 </dl>
@@ -41,7 +41,7 @@ await client.controllerApi.listUserTasks({
 <dl>
 <dd>
 
-**requestOptions:** `ControllerApi.RequestOptions` 
+**requestOptions:** `ExternalApis.RequestOptions` 
     
 </dd>
 </dl>
@@ -53,7 +53,7 @@ await client.controllerApi.listUserTasks({
 </dl>
 </details>
 
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">createTask</a>({ ...params }) -> Apollo.CreateTaskResponse</code></summary>
+<details><summary><code>client.externalApis.<a href="/src/api/resources/externalApis/client/Client.ts">task</a>({ ...params }) -> Apollo.CreateExternalTaskResponse</code></summary>
 <dl>
 <dd>
 
@@ -66,7 +66,7 @@ await client.controllerApi.listUserTasks({
 <dd>
 
 ```typescript
-await client.controllerApi.createTask({
+await client.externalApis.task({
     user_id: "user_id"
 });
 
@@ -84,7 +84,7 @@ await client.controllerApi.createTask({
 <dl>
 <dd>
 
-**request:** `Apollo.CreateTaskRequest` 
+**request:** `Apollo.CreateExternalTaskRequest` 
     
 </dd>
 </dl>
@@ -92,7 +92,7 @@ await client.controllerApi.createTask({
 <dl>
 <dd>
 
-**requestOptions:** `ControllerApi.RequestOptions` 
+**requestOptions:** `ExternalApis.RequestOptions` 
     
 </dd>
 </dl>
@@ -104,7 +104,7 @@ await client.controllerApi.createTask({
 </dl>
 </details>
 
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">getTaskMessages</a>(taskId) -> Apollo.Message[]</code></summary>
+<details><summary><code>client.externalApis.<a href="/src/api/resources/externalApis/client/Client.ts">getTaskMessages</a>(taskId) -> Apollo.ExternalTaskMessage[]</code></summary>
 <dl>
 <dd>
 
@@ -117,7 +117,7 @@ await client.controllerApi.createTask({
 <dd>
 
 ```typescript
-await client.controllerApi.getTaskMessages("task_id");
+await client.externalApis.getTaskMessages("task_id");
 
 ```
 </dd>
@@ -141,7 +141,7 @@ await client.controllerApi.getTaskMessages("task_id");
 <dl>
 <dd>
 
-**requestOptions:** `ControllerApi.RequestOptions` 
+**requestOptions:** `ExternalApis.RequestOptions` 
     
 </dd>
 </dl>
@@ -153,7 +153,7 @@ await client.controllerApi.getTaskMessages("task_id");
 </dl>
 </details>
 
-<details><summary><code>client.controllerApi.<a href="/src/api/resources/controllerApi/client/Client.ts">sendMessage</a>({ ...params }) -> Apollo.Message</code></summary>
+<details><summary><code>client.externalApis.<a href="/src/api/resources/externalApis/client/Client.ts">message</a>({ ...params }) -> Apollo.ExternalTaskMessage</code></summary>
 <dl>
 <dd>
 
@@ -166,7 +166,7 @@ await client.controllerApi.getTaskMessages("task_id");
 <dd>
 
 ```typescript
-await client.controllerApi.sendMessage({
+await client.externalApis.message({
     is_external_api: true,
     task_id: "task_id",
     text: "text"
@@ -186,7 +186,7 @@ await client.controllerApi.sendMessage({
 <dl>
 <dd>
 
-**request:** `Apollo.SubmitMessageRequest` 
+**request:** `Apollo.SubmitExternalMessageRequest` 
     
 </dd>
 </dl>
@@ -194,7 +194,7 @@ await client.controllerApi.sendMessage({
 <dl>
 <dd>
 
-**requestOptions:** `ControllerApi.RequestOptions` 
+**requestOptions:** `ExternalApis.RequestOptions` 
     
 </dd>
 </dl>

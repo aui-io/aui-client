@@ -8,7 +8,7 @@ export interface ApolloEnvironmentUrls {
 export const ApolloEnvironment = {
     Default: {
         base: "https://azure.aui.io/api/ia-controller",
-        staging: "wss://api-staging.internal-aui.io",
+        staging: "wss://api.aui.io",
     },
 } as const;
 

@@ -6,6 +6,6 @@
  *         user_id: "user_id"
  *     }
  */
-export interface CreateTaskRequest {
+export interface CreateExternalTaskRequest {
     user_id: string;
 }

@@ -4,8 +4,8 @@ import * as Apollo from "../../src/api/index";
 import { ApolloClient } from "../../src/Client";
 import { mockServerPool } from "../mock-server/MockServerPool";
 
-describe("ControllerApi", () => {
-    test("list_user_tasks (1)", async () => {
+describe("ExternalApis", () => {
+    test("getTasksByUserId (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -34,7 +34,7 @@ describe("ControllerApi", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.controllerApi.listUserTasks({
+        const response = await client.externalApis.getTasksByUserId({
             user_id: "user_id",
             page: 1,
             size: 1,
@@ -55,7 +55,7 @@ describe("ControllerApi", () => {
         });
     });
 
-    test("list_user_tasks (2)", async () => {
+    test("getTasksByUserId (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -72,13 +72,13 @@ describe("ControllerApi", () => {
             .build();
 
         await expect(async () => {
-            return await client.controllerApi.listUserTasks({
+            return await client.externalApis.getTasksByUserId({
                 user_id: "user_id",
             });
         }).rejects.toThrow(Apollo.UnprocessableEntityError);
     });
 
-    test("create_task (1)", async () => {
+    test("task (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -101,7 +101,7 @@ describe("ControllerApi", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.controllerApi.createTask({
+        const response = await client.externalApis.task({
             user_id: "user_id",
         });
         expect(response).toEqual({
@@ -113,7 +113,7 @@ describe("ControllerApi", () => {
         });
     });
 
-    test("create_task (2)", async () => {
+    test("task (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -131,13 +131,13 @@ describe("ControllerApi", () => {
             .build();
 
         await expect(async () => {
-            return await client.controllerApi.createTask({
+            return await client.externalApis.task({
                 user_id: "user_id",
             });
         }).rejects.toThrow(Apollo.UnprocessableEntityError);
     });
 
-    test("get_task_messages (1)", async () => {
+    test("getTaskMessages (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -151,7 +151,8 @@ describe("ControllerApi", () => {
                 text: "text",
                 sender: { id: "id", type: "user", email: "email" },
                 receiver: { id: "id", type: "user", email: "email" },
-                cards: [{ id: "id", name: "name", parameters: [], is_recommended: true }],
+                options: [{ is_recommended: true, widget_parameters: [{ title: "title", type: "boolean" }] }],
+                variants_options: [{ is_recommended: true, widget_parameters: [{ title: "title", type: "boolean" }] }],
                 followup_suggestions: ["followup_suggestions"],
             },
         ];
@@ -163,7 +164,7 @@ describe("ControllerApi", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.controllerApi.getTaskMessages("task_id");
+        const response = await client.externalApis.getTaskMessages("task_id");
         expect(response).toEqual([
             {
                 id: "id",
@@ -179,12 +180,26 @@ describe("ControllerApi", () => {
                     type: "user",
                     email: "email",
                 },
-                cards: [
+                options: [
                     {
-                        id: "id",
-                        name: "name",
-                        parameters: [],
                         is_recommended: true,
+                        widget_parameters: [
+                            {
+                                title: "title",
+                                type: "boolean",
+                            },
+                        ],
+                    },
+                ],
+                variants_options: [
+                    {
+                        is_recommended: true,
+                        widget_parameters: [
+                            {
+                                title: "title",
+                                type: "boolean",
+                            },
+                        ],
                     },
                 ],
                 followup_suggestions: ["followup_suggestions"],
@@ -192,7 +207,7 @@ describe("ControllerApi", () => {
         ]);
     });
 
-    test("get_task_messages (2)", async () => {
+    test("getTaskMessages (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -209,11 +224,11 @@ describe("ControllerApi", () => {
             .build();
 
         await expect(async () => {
-            return await client.controllerApi.getTaskMessages("task_id");
+            return await client.externalApis.getTaskMessages("task_id");
         }).rejects.toThrow(Apollo.UnprocessableEntityError);
     });
 
-    test("send_message (1)", async () => {
+    test("message (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -226,7 +241,8 @@ describe("ControllerApi", () => {
             text: "text",
             sender: { id: "id", type: "user", email: "email" },
             receiver: { id: "id", type: "user", email: "email" },
-            cards: [{ id: "id", name: "name", parameters: [], is_recommended: true }],
+            options: [{ is_recommended: true, widget_parameters: [{ title: "title", type: "boolean" }] }],
+            variants_options: [{ is_recommended: true, widget_parameters: [{ title: "title", type: "boolean" }] }],
             followup_suggestions: ["followup_suggestions"],
         };
         server
@@ -238,7 +254,7 @@ describe("ControllerApi", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.controllerApi.sendMessage({
+        const response = await client.externalApis.message({
             is_external_api: true,
             task_id: "task_id",
             text: "text",
@@ -257,19 +273,33 @@ describe("ControllerApi", () => {
                 type: "user",
                 email: "email",
             },
-            cards: [
+            options: [
                 {
-                    id: "id",
-                    name: "name",
-                    parameters: [],
                     is_recommended: true,
+                    widget_parameters: [
+                        {
+                            title: "title",
+                            type: "boolean",
+                        },
+                    ],
+                },
+            ],
+            variants_options: [
+                {
+                    is_recommended: true,
+                    widget_parameters: [
+                        {
+                            title: "title",
+                            type: "boolean",
+                        },
+                    ],
                 },
             ],
             followup_suggestions: ["followup_suggestions"],
         });
     });
 
-    test("send_message (2)", async () => {
+    test("message (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new ApolloClient({
             networkApiKey: "test",
@@ -287,7 +317,7 @@ describe("ControllerApi", () => {
             .build();
 
         await expect(async () => {
-            return await client.controllerApi.sendMessage({
+            return await client.externalApis.message({
                 task_id: "task_id",
                 text: "text",
             });
